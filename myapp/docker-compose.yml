@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+
+# the database container
+  mariadb:
+    image: docker.io/bitnami/mariadb:10.6
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_myapp
+      - MARIADB_DATABASE=bitnami_myapp
+
+# the laravel container
+  myapp:
+    image: docker.io/bitnami/laravel:10
+    ports:
+      - '8809:8000'
+    environment:
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USERNAME=bn_myapp
+      - DB_DATABASE=bitnami_myapp
+
+    # Create a single bind mount for entire project
+    # This means no volume is created: all changes
+    # are saved on HDD and container, but no
+    # persistence beyond that
+    volumes:
+      - './my-project:/app'
+    depends_on:
+      - mariadb
+    privileged: false
+
